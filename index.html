@@ -68,14 +68,21 @@ section{position:relative}
 .link:hover::after{transform:scaleX(0);transform-origin:left}
 
 /* loader */
-.ld{position:fixed;inset:0;z-index:300;background:var(--paper);display:grid;place-items:center;animation:ldfail .01s 5s forwards}
+.ld{position:fixed;inset:0;z-index:300;background:var(--blush);animation:ldfail .01s 7s forwards;will-change:transform}
+.ld::after{content:"";position:absolute;left:-15%;right:-15%;top:calc(100% - 1px);height:16vh;background:var(--blush);border-radius:0 0 50% 50%}
 @keyframes ldfail{to{visibility:hidden}}
-.ld .in{display:flex;flex-direction:column;align-items:center;gap:18px}
-.ld svg{width:54px;height:54px;color:var(--ink)}
-.ld .w{font-family:var(--f-mark);font-size:26px;letter-spacing:.3em;padding-left:.3em;overflow:hidden;display:flex}
+.ld .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,3vh,28px);padding:env(safe-area-inset-top,0px) var(--gr) env(safe-area-inset-bottom,0px) var(--gl)}
+.ld .mk{width:58px;height:58px;color:var(--ink)}
+.ld .mk rect{transform-origin:50% 50%}
+.ld .ph{position:relative;width:clamp(120px,12vw,170px);aspect-ratio:3/4;overflow:hidden;border-radius:999px 999px 4px 4px;background:var(--beige);clip-path:inset(50% 0 50% 0)}
+.ld .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%;clip-path:inset(100% 0 0 0)}
+.ld .w{font-family:var(--f-mark);font-size:clamp(28px,3.4vw,40px);letter-spacing:.32em;padding-left:.32em;display:flex;overflow:hidden;line-height:1.1}
 .ld .w span{display:inline-block}
-.ld .bar{width:140px;height:1px;background:var(--line);position:relative;overflow:hidden}
-.ld .bar i{position:absolute;inset:0;background:var(--ink);transform-origin:left;transform:scaleX(0)}
+.ld .tag{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--brown);overflow:hidden}
+.ld .tag span{display:inline-block}
+.ld .num{position:absolute;right:var(--gr);bottom:calc(22px + env(safe-area-inset-bottom,0px));font-family:var(--f-mark);font-size:clamp(40px,6vw,84px);line-height:.9;font-variant-numeric:tabular-nums;color:var(--ink)}
+.ld .yr{position:absolute;left:var(--gl);bottom:calc(30px + env(safe-area-inset-bottom,0px));font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brown)}
+.ld .ln{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--ink);transform-origin:left;transform:scaleX(0)}
 .done .ld{display:none}
 
 /* announce + header */
@@ -378,7 +385,17 @@ footer{background:var(--ink);color:#f3e7e2;padding-block:72px 28px}
   </defs>
 </svg>
 
-<div class="ld" id="ld" aria-hidden="true"><div class="in"><svg><use href="#mark"/></svg><div class="w"><span>S</span><span>h</span><span>i</span><span>b</span><span>o</span><span>r</span><span>i</span></div><div class="bar"><i id="ldb"></i></div></div></div>
+<div class="ld" id="ld" aria-hidden="true">
+  <div class="in">
+    <svg class="mk" viewBox="0 0 100 100"><rect x="21" y="21" width="58" height="58" rx="19" transform="rotate(45 50 50)" fill="currentColor"/><path id="ldS" d="M53 10 C 36 22, 36 38, 49 50 C 62 62, 64 76, 47 90" fill="none" stroke="#f7e3e0" stroke-width="3.4" stroke-linecap="round"/></svg>
+    <div class="ph" id="ldPh"><img src="img/blush-1.jpg" alt=""><img src="img/amber-3.jpg" alt=""><img src="img/noir-1.jpg" alt=""><img src="img/lilac-2.jpg" alt=""><img src="img/teal-2.jpg" alt=""></div>
+    <div class="w" id="ldW"><span>S</span><span>h</span><span>i</span><span>b</span><span>o</span><span>r</span><span>i</span></div>
+    <div class="tag"><span>Statement tops · Made in India</span></div>
+  </div>
+  <span class="yr">New drop · 2026</span>
+  <div class="num" id="ldN">0</div>
+  <div class="ln" id="ldL"></div>
+</div>
 
 <div class="ann"><span id="annT">Free shipping across India</span></div>
 <header class="site" id="hdr">
@@ -657,7 +674,6 @@ function auto(){clearInterval(timer);if(!reduce)timer=setInterval(()=>go(si+1),4
 $$('#dots button').forEach((d,i)=>d.onclick=()=>{go(i);auto()});
 $('#slides').addEventListener('click',()=>openProduct(SL[si][0]));
 $('#slides').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openProduct(SL[si][0])}});
-auto();
 
 /* smooth scroll (desktop only) */
 let lenis=null;
@@ -672,21 +688,36 @@ if(lenis)lenis.on('scroll',e=>onY(e.scroll));else addEventListener('scroll',()=>
 /* loader + intro */
 function intro(){
   document.documentElement.classList.add('done');
+  setTimeout(auto,1800);
   if(!G)return;
   gsap.timeline({defaults:{ease:'expo.out'}})
-    .from('.hero .hl',{yPercent:110,duration:1.3,stagger:.09},0)
-    .from('.hero .rv-f',{y:24,opacity:0,duration:1.1,stagger:.08},.25)
-    .from('.hm-main',{clipPath:'inset(100% 0 0 0 round 999px 999px 4px 4px)',duration:1.4,ease:'expo.inOut'},0)
-    .from('.hm-side .frame',{clipPath:'inset(100% 0 0 0)',duration:1.2,stagger:.12,ease:'expo.inOut'},.2)
-    .from('.hm-tag,.dots',{opacity:0,duration:.8},.9);
+    .from('.hero .hl',{yPercent:115,rotate:4,duration:1.4,stagger:.1},0)
+    .from('.hero .rv-f',{y:30,opacity:0,duration:1.2,stagger:.08},.3)
+    .from('.hm-main',{clipPath:'inset(100% 0 0 0 round 999px 999px 4px 4px)',duration:1.5,ease:'expo.inOut'},0)
+    .from('.hm-main img.on',{scale:1.3,duration:2.2,ease:'expo.out'},0)
+    .from('.hm-side .frame',{clipPath:'inset(100% 0 0 0)',duration:1.3,stagger:.14,ease:'expo.inOut'},.2)
+    .from('.hm-side img',{scale:1.3,duration:2,stagger:.14},.2)
+    .from('.hm-tag,.dots',{opacity:0,y:10,duration:.8},1)
+    .from('#hdr .wrap > *',{y:-16,opacity:0,duration:1,stagger:.06},.1)
+    .from('.ann span',{yPercent:100,duration:.8},.1);
 }
 (function(){const L=$('#ld');if(!G){L.remove();intro();return}
-  gsap.timeline({onComplete:()=>L.remove()})
-    .from('.ld svg',{scale:.6,opacity:0,duration:.7,ease:'power3.out'})
-    .from('.ld .w span',{yPercent:110,duration:.7,stagger:.04,ease:'expo.out'},'-=.4')
-    .to('#ldb',{scaleX:1,duration:.9,ease:'power2.inOut'},'-=.5')
-    .to(L,{opacity:0,duration:.5,ease:'power2.out'})
-    .add(intro,'-=.45');
+  const S=$('#ldS'),len=S.getTotalLength();S.style.strokeDasharray=len;S.style.strokeDashoffset=len;
+  const imgs=$$('#ldPh img'),n={v:0};
+  const tl=gsap.timeline({onComplete:()=>L.remove()});
+  tl.from('.ld .mk rect',{scale:0,rotate:-90,duration:1,ease:'expo.out'},0)
+    .to(S,{strokeDashoffset:0,duration:.9,ease:'power2.inOut'},.35)
+    .from('#ldW span',{yPercent:110,duration:1,stagger:.05,ease:'expo.out'},.25)
+    .from('#ldW',{letterSpacing:'.7em',duration:1.4,ease:'expo.out'},.25)
+    .from('.ld .tag span',{yPercent:110,duration:.8,ease:'expo.out'},.6)
+    .from('.ld .yr',{opacity:0,y:10,duration:.6},.5)
+    .to('#ldPh',{clipPath:'inset(0% 0 0% 0)',duration:.8,ease:'expo.inOut'},.9);
+  imgs.forEach((im,k)=>tl.to(im,{clipPath:'inset(0% 0 0 0)',duration:.45,ease:'power3.inOut'},1.15+k*.26));
+  tl.to(n,{v:100,duration:2.4,ease:'power2.inOut',onUpdate:()=>{$('#ldN').textContent=Math.round(n.v);$('#ldL').style.transform=`scaleX(${n.v/100})`}},0)
+    .to('#ldPh',{scale:1.08,duration:.6,ease:'power2.inOut'},2.35)
+    .to('.ld .in > *, .ld .yr, .ld .num',{y:-30,opacity:0,duration:.5,stagger:.03,ease:'power2.in'},2.5)
+    .to(L,{yPercent:-118,duration:1.1,ease:'expo.inOut'},2.75)
+    .add(intro,3.05);
 })();
 
 /* scroll reveals (quiet) */
